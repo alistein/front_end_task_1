@@ -17,6 +17,8 @@ const UserForm = ({ postData, editData, users }: IForm & IUsers) => {
     const param = useParams();
     const navigation = useNavigate();
 
+    const id = param.id
+
     useEffect(() => {
         if(location.pathname === '/user-form') return;
 
@@ -43,8 +45,7 @@ const UserForm = ({ postData, editData, users }: IForm & IUsers) => {
         if (location.pathname === '/user-form') {
             postData(data);
         } else {
-            const index = users?.findIndex(user => user.id === param.id);
-            editData!(index!, data);
+            editData!(param.id! , data);
             navigation('/');
         }
 

@@ -3,57 +3,53 @@ import UserList from './components/UserList';
 import UserForm from './components/UserForm';
 import { IData } from './Interfaces/interfaces';
 import { Routes, Route } from 'react-router-dom';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { createContext } from 'react';
+import axios from 'axios';
 
-const DUMMY_DATA = [
-  {
-    id: '1',
-    fullname: 'Ali Aliyev',
-    email: 'example@gmail.com',
-    role: 'Super Admin'
-  },
-  {
-    id: '2',
-    fullname: 'Niyameddin Musayev',
-    email: 'example2@gmail.com',
-    role: 'Admin'
-  },
-  {
-    id: '3',
-    fullname: 'Taylor Swift',
-    email: 'example3@gmail.com',
-    role: 'User'
-  },
-
-]
+const BASE_URL = 'http://localhost:3000/users'
 
 const App = () => {
-  const [users, setUsers] = useState<IData[]>(DUMMY_DATA); // Main data
+  const [users, setUsers] = useState<IData[]>([]); // Main data
+
+  useEffect(() => {
+    axios.get(BASE_URL).then(data => { setUsers(data.data) })
+  }, [])
 
   const postData = (data: IData) => {
-    setUsers(prevUsers => [...prevUsers, data]);
+    axios.post(BASE_URL, { ...data }).then(response => setUsers(prevUsers => [...prevUsers, response.data]))
   }
 
   const deleteData = (id: string) => {
-    const remainingUsers = users.filter(user => user.id !== id);
-    setUsers(remainingUsers);
+    axios.delete(`${BASE_URL}/${id}`).then(() => setUsers(prevUsers => prevUsers.filter(user => user.id !== id)))
   }
 
-  const editData = (index: number, data: IData) => {
-    setUsers(prevUsers => {
-      const updatedUsers = [...prevUsers];
-      updatedUsers[index] = data;
-      return updatedUsers;
-    })
+  const editData = (id: string, data: IData) => {
+    axios.put(`${BASE_URL}/${id}`, { ...data }).then((response) => setUsers(prevUsers => prevUsers.map(user => (user.id === id ? response.data : user))));
+  }
+
+  const filterData = (filters: IData) => {
+    const queryParams = Object.entries(filters)
+      .filter(([, value]) => value)
+      .map(([key, value]) => {
+        if (key === 'fullname' || key === 'email') {
+          return `${key}_like=${value}`
+        }
+        return `${key}=${value}`
+      }
+      )
+      .join('&');
+
+    axios.get(`${BASE_URL}?${queryParams}`).then(response => setUsers(response.data))
   }
 
   return (
     <>
       <Routes>
-        <Route path='user-form' element={<UserForm postData={postData}/>} />
+        <Route path='user-form' element={<UserForm postData={postData} />} />
         <Route path='user-form/edit/:id' element={<UserForm postData={postData} users={users} editData={editData} />} />
         <Route path='/' element={
-          <UserList deleteUserFromList={deleteData} users={users} />
+          <UserList filterUsers={filterData} deleteUserFromList={deleteData} users={users} />
         } />
       </Routes>
     </>

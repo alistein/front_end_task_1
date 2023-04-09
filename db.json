@@ -1,16 +1,10 @@
 {
   "users": [
     {
-      "id": "2",
-      "fullname": "Culver Stanyan",
-      "email": "cstanyan1@behance.net",
-      "role": "Admin"
-    },
-    {
       "id": "3",
       "fullname": "Corie Ales",
       "email": "cales2@china.com.cn",
-      "role": "Admin"
+      "role": "Super Admin"
     },
     {
       "id": "4",
@@ -40,7 +34,7 @@
       "id": "8",
       "fullname": "Melanie Cornell",
       "email": "mcornell7@fotki.com",
-      "role": "Super Admin"
+      "role": "Admin"
     },
     {
       "id": "9",

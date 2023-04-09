@@ -4,17 +4,33 @@ import UserForm from './components/UserForm';
 import { IData } from './Interfaces/interfaces';
 import { Routes, Route } from 'react-router-dom';
 import { useCallback, useEffect, useState } from 'react';
-import { createContext } from 'react';
 import axios from 'axios';
 
 const BASE_URL = 'http://localhost:3000/users'
 
 const App = () => {
   const [users, setUsers] = useState<IData[]>([]); // Main data
+  const [filters, setFilters] = useState<IData>();
 
   useEffect(() => {
-    axios.get(BASE_URL).then(data => { setUsers(data.data) })
+    axios.get(BASE_URL).then(data => {setUsers(data.data) })
   }, [])
+
+  useEffect(() => {
+    if(!filters) return;
+    const queryParams = Object.entries(filters!)
+    .filter(([, value]) => value)
+    .map(([key, value]) => {
+      if (key === 'fullname' || key === 'email') {
+        return `${key}_like=${value}`
+      }
+      return `${key}=${value}`
+    }
+    )
+    .join('&');
+
+    axios.get(`${BASE_URL}?${queryParams}`).then(response => setUsers(response.data))
+  },[users])
 
   const postData = (data: IData) => {
     axios.post(BASE_URL, { ...data }).then(response => setUsers(prevUsers => [...prevUsers, response.data]))
@@ -25,10 +41,12 @@ const App = () => {
   }
 
   const editData = (id: string, data: IData) => {
+    if(!id || !data ) return;
     axios.put(`${BASE_URL}/${id}`, { ...data }).then((response) => setUsers(prevUsers => prevUsers.map(user => (user.id === id ? response.data : user))));
   }
 
-  const filterData = (filters: IData) => {
+  const filterData = useCallback((filters: IData) => {
+    setFilters(filters);
     const queryParams = Object.entries(filters)
       .filter(([, value]) => value)
       .map(([key, value]) => {
@@ -41,7 +59,7 @@ const App = () => {
       .join('&');
 
     axios.get(`${BASE_URL}?${queryParams}`).then(response => setUsers(response.data))
-  }
+  },[users])
 
   return (
     <>
@@ -56,5 +74,4 @@ const App = () => {
 
   )
 }
-
 export default App

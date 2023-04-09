@@ -13,19 +13,19 @@ const UserList = ({ users, deleteUserFromList, filterUsers }: IUsers) => {
     return (
         <Container>
             <div>
-                <div className="flex justify-between mb-2">
+                <div className="lg:flex lg:space-y-0 space-y-4 justify-between mb-2">
                     <h1 className="font-extrabold text-4xl">Users:</h1>
-                    <div className="flex gap-2">
+                    <div className="grid grid-cols-2 gap-4">
                         <Link
                             to={'/user-form'}
-                            className="bg-blue-500 px-3 flex justify-center items-center rounded-sm transition-colors hover:bg-blue-600 active:bg-blue-500 text-white">
+                            className="bg-blue-500 py-2  px-3 flex justify-center items-center rounded-sm transition-colors hover:bg-blue-600 active:bg-blue-500 text-white">
                             Add
                             &nbsp;
                             <BsPersonAdd />
                         </Link>
                         <button
                             onClick={() => { setToggle(prev => !prev) }}
-                            className="text-white flex items-center bg-yellow-500 px-3 hover:bg-yellow-600 active:bg-yellow-500">
+                            className="text-white flex py-2 justify-center items-center bg-yellow-500 px-3 hover:bg-yellow-600 active:bg-yellow-500">
                             Filters
                             &nbsp;
                             <MdFilterList />
@@ -33,6 +33,7 @@ const UserList = ({ users, deleteUserFromList, filterUsers }: IUsers) => {
                     </div>
                 </div>
                 {toggle && <Filter filterData={filterUsers!} />}
+                <div className='relative overflow-y-auto lg:space-y-0 space-y-4 lg:h-full h-[500px]'>
                 {users!.map((user, index) => (
                     <User
                         editUser={() => {
@@ -50,7 +51,8 @@ const UserList = ({ users, deleteUserFromList, filterUsers }: IUsers) => {
                         role={user.role}
                     />
                 ))}
-            </div>
+                </div>
+                        </div>
         </Container>
     );
 };

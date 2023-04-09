@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import React from 'react'
 import Container from './Container'
-import { IForm, IData, IUsers} from '../Interfaces/interfaces'
+import { IForm, IData, IUsers } from '../Interfaces/interfaces'
 import { nanoid } from 'nanoid'
 import { useLocation, useParams, useNavigate } from 'react-router-dom'
 
@@ -20,7 +20,7 @@ const UserForm = ({ postData, editData, users }: IForm & IUsers) => {
     const id = param.id
 
     useEffect(() => {
-        if(location.pathname === '/user-form') return;
+        if (location.pathname === '/user-form') return;
 
         const editedUser = users?.find(user => user.id === param.id);
         setFullname(editedUser!.fullname);
@@ -35,7 +35,7 @@ const UserForm = ({ postData, editData, users }: IForm & IUsers) => {
             return;
         }
 
-        if(email === ""){
+        if (email === "") {
             setEmailError("Fill the email input");
             setFullnameError('');
             return;
@@ -45,7 +45,7 @@ const UserForm = ({ postData, editData, users }: IForm & IUsers) => {
         if (location.pathname === '/user-form') {
             postData(data);
         } else {
-            editData!(param.id! , data);
+            editData!(param.id!, data);
             navigation('/');
         }
 
@@ -58,19 +58,19 @@ const UserForm = ({ postData, editData, users }: IForm & IUsers) => {
 
     return (
         <Container>
-            <div className='grid grid-cols-2 gap-3 mx-auto lg:w-1/2  w-full'>
+            <div className='grid grid-cols-2 pt-8 gap-3 mx-auto lg:w-1/2  w-full'>
                 <div className='col-span-1'>
-                <input
-                    onChange={(e) => setFullname(e.target.value)}
-                    value={fullname}
-                    type="text" className='border-slate-300 w-full border-2 py-2 px-2 outline-none rounded-sm' placeholder='Full Name:' />
+                    <input
+                        onChange={(e) => setFullname(e.target.value)}
+                        value={fullname}
+                        type="text" className='border-slate-300 w-full border-2 py-2 px-2 outline-none rounded-sm' placeholder='Full Name:' />
                     <p className='font-bold text-red-600'>{fullnameError ? fullnameError : ''}</p>
                 </div>
                 <div className='col-span-1'>
-                <input
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    type="email" className='border-slate-300 w-full border-2 py-2 px-2 outline-none rounded-sm col-span-1' placeholder='Email:' />
+                    <input
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        type="email" className='border-slate-300 w-full border-2 py-2 px-2 outline-none rounded-sm col-span-1' placeholder='Email:' />
                     <p className='font-bold text-red-600'>{emailError ? emailError : ''}</p>
                 </div>
                 <select
@@ -83,7 +83,10 @@ const UserForm = ({ postData, editData, users }: IForm & IUsers) => {
                 </select>
                 <button
                     onClick={transformData}
-                    className='bg-blue-500 col-span-2 py-2 text-white rounded-sm transition-colors hover:bg-blue-600 active:bg-blue-500'>
+                    className={`
+                    ${location.pathname !== "/user-form" ? 'bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-500' 
+                    : 'bg-blue-500 hover:bg-blue-600 active:bg-blue-500'} 
+                    col-span-2 py-2 text-white rounded-sm transition-colors `}>
                     {location.pathname !== "/user-form" ? 'Edit User' : 'Add User'}
                 </button>
             </div>

@@ -1,6 +1,11 @@
 export interface IForm {
-  postData: (data: IData) => void;
-  editData?: (id: string, data: IData) => void;
+  method?: "POST" | "DELETE" | "PATCH" | "PUT",
+}
+
+export interface IFilter {
+  fullname: string,
+  email: string,
+  role: string
 }
 
 export interface IData {

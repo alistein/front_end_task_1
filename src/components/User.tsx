@@ -14,7 +14,8 @@ const User = ({ fullname, email, role, index, deleteUser, editUser }: IUser) => 
             <div className='py-3 px-2 flex justify-center items-center'>
                 <p className='bg-yellow-200 text-yellow-700 inline-block  px-2 rounded-full'>{role}</p>
             </div>
-            <div className='py-3 px-2 lg:justify-self-auto justify-self-center flex flex-col gap-2 md:flex-row'> <button
+            <div className='py-3 px-2 lg:justify-self-auto justify-self-center flex flex-col gap-2 md:flex-row'>
+            <button
                 onClick={() => {
                     deleteUser();
                 }}

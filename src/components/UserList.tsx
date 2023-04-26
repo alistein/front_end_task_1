@@ -1,15 +1,25 @@
 import React, { useState } from "react";
 import User from "./User";
 import Container from "./Container";
-import { IUsers } from "../Interfaces/interfaces";
-import { Link, useNavigate } from "react-router-dom";
+import { IUsers, IData } from "../Interfaces/interfaces";
+import { Link, Params, redirect, useActionData, useNavigate } from "react-router-dom";
 import { BsPersonAdd } from 'react-icons/bs'
 import { MdFilterList } from 'react-icons/md'
 import Filter from "./Filter";
+import axios from "axios";
+import { useLoaderData, useSubmit } from "react-router-dom";
 
-const UserList = ({ users, deleteUserFromList, filterUsers }: IUsers) => {
+const BASE_URL = 'http://localhost:3000/users'
+
+const UserList = () => {
     const [toggle, setToggle] = useState(false);
     const navigate = useNavigate();
+
+    const users = useLoaderData();
+    const filteredUsers = useActionData();
+
+    console.log(filteredUsers)
+
     return (
         <Container>
             <div>
@@ -32,16 +42,17 @@ const UserList = ({ users, deleteUserFromList, filterUsers }: IUsers) => {
                         </button>
                     </div>
                 </div>
-                {toggle && <Filter filterData={filterUsers!} />}
+                {toggle && <Filter />}
                 <div className='relative overflow-y-auto lg:space-y-0 space-y-4 lg:h-full h-[500px]'>
-                {users!.map((user, index) => (
+                {((filteredUsers ? filteredUsers : users) as IData[]).map((user, index) => (
                     <User
                         editUser={() => {
                             navigate(`user-form/edit/${user.id}`)
 
                         }}
                         deleteUser={() => {
-                            deleteUserFromList!(user.id!);
+                            axios.delete(`${BASE_URL}/${user.id}`)
+                            navigate("/")
                         }}
                         key={user.id}
                         id={user.id}
@@ -58,3 +69,37 @@ const UserList = ({ users, deleteUserFromList, filterUsers }: IUsers) => {
 };
 
 export default UserList;
+
+export const loader = async() => {
+
+    const data = (await axios.get(BASE_URL)).data
+
+    return data;
+
+}
+
+
+export const action = async({request,params}: {request: Request, params: Params}) => {
+    let filterData = await request.formData();
+
+    let extractedFilterData = {
+        fullname: filterData.get("fullname"),
+        email: filterData.get("email"),
+        role: filterData.get("role"),
+    }
+
+    const queryParams = Object.entries(extractedFilterData)
+      .filter(([, value]) => value)
+      .map(([key, value]) => {
+        if (key === 'fullname' || key === 'email') {
+          return `${key}_like=${value}`
+        }
+        return `${key}=${value}`
+      }
+      )
+      .join('&');
+
+    const data = (await axios.get(`${BASE_URL}?${queryParams}`)).data
+
+    return data;
+}
